@@ -10,7 +10,7 @@ Experimenting with CS2 training server plugin stuff.
 ### Instructions
 - Clone this repository into your favorite directory
 - Run `<your_favorite_directory>\cs2-training-srv\scripts\setupserver.cmd`, answer all prompts
-- Run any of the shortcuts created on your desktop
+- Run any of the shortcuts created on your desktop to start a server instance
 - Launch CS2 from steam
 - Once the game is up and running, press tilde (`~`) to bring up the console
 - Type `connect localhost` and you will connect to the server
