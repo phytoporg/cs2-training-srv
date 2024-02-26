@@ -8,17 +8,11 @@ Experimenting with CS2 training server plugin stuff.
 - [fake_rcon guide](https://forums.alliedmods.net/showpost.php?p=2811082&postcount=15)
 
 ### Instructions
-- Download and extract [steamcmd](https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip) to your favorite directory
-- run `steamcmd.exe` from the CLI
-- From the steamcmd prompt: `login <your_steam_username>` and provide your steam login credentials
-- `force_install_dir <directory_for_server>` to set the server install directory. You'll get a warning about calling this before login. Ignore it.
-- `app_update 730 validate` to install the server. Let it download, it might take a bit.
-- Download the latest build of [metamod](https://www.sourcemm.net/downloads.php/?branch=master)
-- Extract the `addons` directory into `<directory_for_server>/game/csgo/addons`
-- Open `<directory_for_server>/game/csgo/gameinfo.gi` in your favorite text editor
-- Create a new line underneath `Game_LowViolence  csgo_lv` and add `Game  csgo/addons/metamod`. Your `gameinfo.gi` should look like [this](https://docs.cssharp.dev/images/gameinfogi-example.png)
-- Download [CounterStrikeSharp](https://github.com/roflmuffin/CounterStrikeSharp/releases) and copy the `/addons` directory to `/game/csgo/`
-- Download [fake_rcon](https://forums.alliedmods.net/showthread.php?t=344083) and copy the `/addons` directory to `/game/csgo`
-- Configure the rcon password in `/addons/configs/fake_rcon/config.ini`
-- Once connected to the server, verify that `CounterStrikeSharp` and `fake_rcon` are loaded with the `meta list` command
-- You'll need to authenticate with `fake_rcon_password <password>` to use commands which require admin privileges, and prefix those commands with `fake_rcon`
+- Clone this repository into your favorite directory
+- Run `<your_favorite_directory>\cs2-training-srv\scripts\setupserver.cmd`, answer all prompts
+- Run any of the shortcuts created on your desktop to start a server instance
+- Launch CS2 from steam
+- Once the game is up and running, press tilde (`~`) to bring up the console
+- Type `connect localhost` and you will connect to the server
+- Use `fake_rcon_password password` to authenticate for using admin commands
+- Issue admin commands (like `sv_cheat 1`) by prefixing with `fake_rcon`. For example: `fake_rcon sv_cheat 1`.
