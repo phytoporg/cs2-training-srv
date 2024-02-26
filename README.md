@@ -5,6 +5,7 @@ Experimenting with CS2 training server plugin stuff.
 ### References
 - [Valve SteamCMD wiki page](https://developer.valvesoftware.com/wiki/SteamCMD#Downloading_SteamCMD)
 - [CounterStrikeSharp "Getting Started" guide](https://docs.cssharp.dev/docs/guides/getting-started.html)
+- [fake_rcon guide](https://forums.alliedmods.net/showpost.php?p=2811082&postcount=15)
 
 ### Instructions
 - Download and extract [steamcmd](https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip) to your favorite directory
@@ -17,4 +18,7 @@ Experimenting with CS2 training server plugin stuff.
 - Open `<directory_for_server>/game/csgo/gameinfo.gi` in your favorite text editor
 - Create a new line underneath `Game_LowViolence  csgo_lv` and add `Game  csgo/addons/metamod`. Your `gameinfo.gi` should look like [this](https://docs.cssharp.dev/images/gameinfogi-example.png)
 - Download [CounterStrikeSharp](https://github.com/roflmuffin/CounterStrikeSharp/releases) and copy the `/addons` directory to `/game/csgo/`
-- Once connected to the server, verify that `CounterStrikeSharp` is loaded with the `meta list` command.
+- Download [fake_rcon](https://forums.alliedmods.net/showthread.php?t=344083) and copy the `/addons` directory to `/game/csgo`
+- Configure the rcon password in `/addons/configs/fake_rcon/config.ini`
+- Once connected to the server, verify that `CounterStrikeSharp` and `fake_rcon` are loaded with the `meta list` command
+- You'll need to authenticate with `fake_rcon_password <password>` to use commands which require admin privileges, and prefix those commands with `fake_rcon`
