@@ -6,6 +6,12 @@ set GAMEINFO_CONFIG=%CONFIG_ROOT%\gameinfo.gi
 set FAKE_RCON_CONFIG=%CONFIG_ROOT%\fake_rcon_config.gi
 set GAMEMODE_TRAINING_CONFIG=%CONFIG_ROOT%\gamemode_training.cfg
 
+REM URLs for all downloads
+set STEAMCMD_URL=https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip
+set METAMOD_URL=https://mms.alliedmods.net/mmsdrop/2.0/mmsource-2.0.0-git1282-windows.zip
+set CSS_URL=https://github.com/roflmuffin/CounterStrikeSharp/releases/download/v175/counterstrikesharp-build-175-windows-a5399dd.zip
+set FAKERCON_URL=https://github.com/Salvatore-Als/cs2-fake-rcon/releases/download/1.2.1a/windows.zip
+
 if not exist "%CONFIG_ROOT%" (
   echo Config path not found: %CONFIG_ROOT%
   exit /b -1
@@ -29,7 +35,7 @@ if /I "%DEL_SERVER_ROOT%"=="Y" (
 set STEAMCMD_ARCHIVE_TARGET=%TMP%\steamcmd.zip
 <NUL set /p="Downloading and extracting steamcmd... "
 del %STEAMCMD_ARCHIVE_TARGET%
-powershell -C "wget https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip -O %STEAMCMD_ARCHIVE_TARGET%" || goto Failed
+powershell -C "wget %STEAMCMD_URL% -O %STEAMCMD_ARCHIVE_TARGET%" || goto Failed
 powershell -C "Expand-Archive -LiteralPath '%STEAMCMD_ARCHIVE_TARGET%' -DestinationPath %TMP% -Force" || goto Failed
 echo done!
 
@@ -41,7 +47,7 @@ echo done!
 set METAMOD_ARCHIVE_TARGET=%TMP%\steamcmd.zip
 <NUL set /p="Downloading, extracting and installing metamod... "
 del %METAMOD_ARCHIVE_TARGET%
-powershell -C "wget https://mms.alliedmods.net/mmsdrop/2.0/mmsource-2.0.0-git1282-windows.zip -O %METAMOD_ARCHIVE_TARGET%" || goto Failed
+powershell -C "wget %METAMOD_URL% -O %METAMOD_ARCHIVE_TARGET%" || goto Failed
 powershell -C "Expand-Archive -LiteralPath '%METAMOD_ARCHIVE_TARGET%' -DestinationPath %SERVER_ROOT%\game\csgo -Force" || goto Failed
 echo done!
 
@@ -52,14 +58,14 @@ echo done!
 set CSS_ARCHIVE_TARGET=%TMP%\css.zip
 <NUL set /p="Downloading and installing CounterStrikeSharp... "
 del %CSS_ARCHIVE_TARGET%
-powershell -C "wget https://github.com/roflmuffin/CounterStrikeSharp/releases/download/v175/counterstrikesharp-build-175-windows-a5399dd.zip -O %CSS_ARCHIVE_TARGET%" || goto Failed
+powershell -C "wget %CSS_URL% -O %CSS_ARCHIVE_TARGET%" || goto Failed
 powershell -C "Expand-Archive -LiteralPath '%CSS_ARCHIVE_TARGET%' -DestinationPath %SERVER_ROOT%\game\csgo -Force" || goto Failed
 echo done!
 
 set FAKERCON_ARCHIVE_TARGET=%TMP%\fake_rcon.zip
 <NUL set /p="Downloading and installing fake_rcon... "
 del %FAKERCON_ARCHIVE_TARGET%
-powershell -C "wget https://github.com/Salvatore-Als/cs2-fake-rcon/releases/download/1.2.1a/windows.zip -O %FAKERCON_ARCHIVE_TARGET%" || goto Failed
+powershell -C "wget %FAKERCON_URL% -O %FAKERCON_ARCHIVE_TARGET%" || goto Failed
 powershell -C "Expand-Archive -LiteralPath '%FAKERCON_ARCHIVE_TARGET%' -DestinationPath %SERVER_ROOT%\game\csgo -Force" || goto Failed
 echo done!
 
