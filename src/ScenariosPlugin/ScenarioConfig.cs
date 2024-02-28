@@ -1,4 +1,5 @@
-﻿using CounterStrikeSharp.API.Modules.Utils;
+﻿using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Utils;
 using System.Collections.Generic;
 
 namespace ScenariosPlugin
@@ -12,6 +13,9 @@ namespace ScenariosPlugin
 
     public struct PlayerPlacement
     {
+        // The name of this placement "i.e. topmid_close"
+        public string Name;
+
         // The 3D position of a player on the target map
         public Vector3 Position;
 
@@ -29,10 +33,10 @@ namespace ScenariosPlugin
         // TODO: win condition(s)
     }
 
-    public enum Map
+    public struct PlacementAssignment
     {
-        Invalid,
-        Mirage
+        public PlayerPlacement PlayerPlacement;
+        public CCSPlayerController? PlayerController;
     }
 
     public class ScenarioConfig
@@ -41,7 +45,7 @@ namespace ScenariosPlugin
         public string Name { get; set; }
 
         // The map for this scenario
-        public Map Map { get; set; }
+        public Map.MapType MapType { get; set; }
 
         // Time limit for the scenario, or -1 if there is no limit
         public int TimeLimitSeconds { get; set; }
@@ -52,7 +56,7 @@ namespace ScenariosPlugin
         public ScenarioConfig()
         {
             Name = "Unnamed";
-            Map = Map.Invalid;
+            MapType = Map.MapType.Invalid;
             PlayerPlacements = new List<PlayerPlacement>();
             TimeLimitSeconds = -1;
         }
