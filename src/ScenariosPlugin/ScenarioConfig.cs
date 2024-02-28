@@ -11,31 +11,34 @@ namespace ScenariosPlugin
         public float z;
     }
 
-    public struct PlayerPlacement
+    public struct SpawnPoint
     {
-        // The name of this placement "i.e. topmid_close"
-        public string Name;
-
         // The 3D position of a player on the target map
         public Vector3 Position;
 
         // The player's angle/look vector
         public Vector3 Angle;
+    }
+
+    public struct SpawnInfo
+    {
+        // The name of this spawn "i.e. topmid_close"
+        public string Name;
 
         // Team assignment for the player
         public CsTeam Team;
 
-        // Must this placement be filled by a player for a scenario, or can it be empty?
-        public bool IsRequired;
+        // Spawn location and orientation
+        public SpawnPoint SpawnPoint;
 
         // TODO: initial weapons state
         // TODO: initial utility state
         // TODO: win condition(s)
     }
 
-    public struct PlacementAssignment
+    public struct SpawnPlayerAssignment
     {
-        public PlayerPlacement PlayerPlacement;
+        public SpawnInfo PlayerPlacement;
         public CCSPlayerController? PlayerController;
     }
 
@@ -51,13 +54,13 @@ namespace ScenariosPlugin
         public int TimeLimitSeconds { get; set; }
 
         // A list of initial player placements
-        public List<PlayerPlacement> PlayerPlacements { get; set; }
+        public List<SpawnInfo> SpawnInfos { get; set; }
 
         public ScenarioConfig()
         {
             Name = "Unnamed";
             MapType = Map.MapType.Invalid;
-            PlayerPlacements = new List<PlayerPlacement>();
+            SpawnInfos = new List<SpawnInfo>();
             TimeLimitSeconds = -1;
         }
     }

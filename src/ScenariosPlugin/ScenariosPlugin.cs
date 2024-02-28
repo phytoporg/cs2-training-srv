@@ -21,6 +21,7 @@ public class ScenariosPlugin : BasePlugin
 
     private ScenarioState _state = ScenarioState.Inactive;
     private List<ScenarioConfig> _scenarioConfigs = new List<ScenarioConfig>();
+    private List<SpawnPlayerAssignment> _spawnPlayerAssignments = new List<SpawnPlayerAssignment>();
     private static Random _random = new Random();
 
     // TODO: can take 0 args if there is currently an active scenario
@@ -72,24 +73,25 @@ public class ScenariosPlugin : BasePlugin
             return;
         }
 
-        // Randomly assign players to placements according to team and restart the round
+        // Randomly assign players to spawns according to team and restart the round
 
-        // First, shuffle the placements list
-        List<PlayerPlacement> shuffledPlacements = List(matchingScenario.PlayerPlacements);
-        int n = shuffledPlacements.Count;
+        // First, shuffle the spawns list
+        List<SpawnInfo> shuffledSpawnInfos = new List<SpawnInfo>(matchingScenario.SpawnInfos);
+        int n = shuffledSpawnInfos.Count;
         while (n > 1)
         {
             n--;
             int k = _random.Next(n + 1);
-            PlayerPlacement value = shuffledPlacements[k];
-            shuffledPlacements[k] = shuffledPlacements[n];
-            shuffledPlacements[n] = value;
+            SpawnInfo value = shuffledSpawnInfos[k];
+            shuffledSpawnInfos[k] = shuffledSpawnInfos[n];
+            shuffledSpawnInfos[n] = value;
         }
 
-        // Put us in the "loading" state before hooking up any listeners
+        // Put us in the "loading" state so listeners behave accordingly
         _state = ScenarioState.Loading;
-        HashSet<string> usedPlacements = new HashSet<string>();
-        List<PlacementAssignment> placementAssignments = new List<PlacementAssignment>(); // TODO: This needs to be a member var
+
+        HashSet<string> usedSpawnNames = new HashSet<string>();
+        _spawnPlayerAssignments.Clear();
         var playerEntities = Utilities.GetPlayers();
         foreach (var playerEntity in playerEntities) 
         { 
@@ -99,32 +101,32 @@ public class ScenariosPlugin : BasePlugin
             }
 
             // Find the next available placement for this team
-            bool foundNextPlacement = false;
-            PlayerPlacement nextPlacement = new PlayerPlacement();
-            foreach (var playerPlacement in shuffledPlacements)
+            bool foundNextSpawnInfo = false;
+            SpawnInfo nextSpawnInfo = new SpawnInfo();
+            foreach (var playerSpawnInfo in shuffledSpawnInfos)
             {
-                if (usedPlacements.Contains(playerPlacement.Name) || playerPlacement.Team != playerEntity.Team)
+                if (usedSpawnNames.Contains(playerSpawnInfo.Name) || playerSpawnInfo.Team != playerEntity.Team)
                 {
                     continue;
                 }
                 else
                 {
-                    foundNextPlacement = true;
-                    nextPlacement = playerPlacement;
+                    foundNextSpawnInfo = true;
+                    nextSpawnInfo = playerSpawnInfo;
                     break;
                 }
             }
 
-            if (foundNextPlacement)
+            if (foundNextSpawnInfo)
             {
-                if (nextPlacement.Name is null)
+                if (nextSpawnInfo.Name is null)
                 {
                     Logger.LogError("Found placement name is unexpectedly null! Skipping player assignment.");
                     continue;
                 }
 
-                usedPlacements.Add(nextPlacement.Name);
-                placementAssignments.Add(new PlacementAssignment() { PlayerPlacement = nextPlacement, PlayerController = playerEntity });
+                usedSpawnNames.Add(nextSpawnInfo.Name);
+                _spawnPlayerAssignments.Add(new SpawnPlayerAssignment() { PlayerPlacement = nextSpawnInfo, PlayerController = playerEntity });
             }
         }
 
@@ -133,6 +135,7 @@ public class ScenariosPlugin : BasePlugin
         if (baseRulesEntity is null)
         {
             Logger.LogError("Failed to find base game rules entity. Bailing on scenario load.");
+            _spawnPlayerAssignments.Clear();
             _state = ScenarioState.Inactive;
             return;
         }
@@ -141,31 +144,24 @@ public class ScenariosPlugin : BasePlugin
         gameRulesEntity.GameRestart = true;
     }
 
-    private List<T> List<T>(List<T> playerPlacements)
-    {
-        throw new NotImplementedException();
-    }
-
     public override void Load(bool hotReload)
     {
         // Just hard-code a scenario for now, we'll worry about persistence later
-        PlayerPlacement TTopMid = new PlayerPlacement();
-        TTopMid.Position = new Vector3() { x = 259.18f, y = 12.83f, z = -143.31f };
-        TTopMid.Angle = new Vector3() { x = -2.43f, y = -161.99f, z = 0f };
+        SpawnInfo TTopMid = new SpawnInfo();
+        TTopMid.SpawnPoint.Position = new Vector3() { x = 259.18f, y = 12.83f, z = -143.31f };
+        TTopMid.SpawnPoint.Angle = new Vector3() { x = -2.43f, y = -161.99f, z = 0f };
         TTopMid.Team = CsTeam.Terrorist;
-        TTopMid.IsRequired = true;
 
-        PlayerPlacement CTWindow = new PlayerPlacement();
-        CTWindow.Position = new Vector3() { x = -1183.97f, y = -811.89f, z = -103.97f };
-        CTWindow.Angle = new Vector3() { x = 0f, y = 15.95f, z = 0f };
+        SpawnInfo CTWindow = new SpawnInfo();
+        CTWindow.SpawnPoint.Position = new Vector3() { x = -1183.97f, y = -811.89f, z = -103.97f };
+        CTWindow.SpawnPoint.Angle = new Vector3() { x = 0f, y = 15.95f, z = 0f };
         CTWindow.Team = CsTeam.CounterTerrorist;
-        CTWindow.IsRequired = true;
 
         var currentConfig = new ScenarioConfig();
         currentConfig.Name = "Mirage.1v1.WindowVsTopMid";
         currentConfig.MapType = Map.MapType.Mirage;
-        currentConfig.PlayerPlacements.Add(TTopMid);
-        currentConfig.PlayerPlacements.Add(CTWindow);
+        currentConfig.SpawnInfos.Add(TTopMid);
+        currentConfig.SpawnInfos.Add(CTWindow);
 
         _scenarioConfigs.Add(currentConfig);
 
@@ -173,7 +169,8 @@ public class ScenariosPlugin : BasePlugin
         {
             if (_state == ScenarioState.Loading && entity.DesignerName == "cs_player_controller")
             {
-                // TODO: find matching player and assign to a slot
+                var player = new CCSPlayerController(entity.Handle);
+                // TODO: find matching player in spawn assignments and set new position
             }
         });
     }
