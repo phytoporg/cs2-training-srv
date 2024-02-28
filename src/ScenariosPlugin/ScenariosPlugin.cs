@@ -23,7 +23,8 @@ public class ScenariosPlugin : BasePlugin
     private List<ScenarioConfig> _scenarioConfigs = new List<ScenarioConfig>();
     private static Random _random = new Random();
 
-    [ConsoleCommand("load_scenario", "Loads a scenario. Must be on the correct map, first.")]
+    // TODO: can take 0 args if there is currently an active scenario
+    [ConsoleCommand("sce_start", "Loads a scenario. Must be on the correct map, first.")]
     [CommandHelper(minArgs: 1, usage: "[scenario]", whoCanExecute: CommandUsage.CLIENT_AND_SERVER)]
     public void LoadScenarioCommand(CCSPlayerController? player, CommandInfo command)
     {

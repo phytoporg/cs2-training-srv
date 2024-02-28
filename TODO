@@ -1,0 +1,9 @@
+COMMANDS:
+sce_list
+- List all scenarios, available ones first (green) followed by unavailable ones (red)
+sce_info [scenario]
+- Dump info about a scenario (active scenario by default)
+sce_start [scenario]
+- Begin a scenario or restarts the active scenario
+sce_stop
+- Stop the current scenario
