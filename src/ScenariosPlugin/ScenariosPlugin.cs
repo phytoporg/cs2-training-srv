@@ -12,17 +12,25 @@ public class ScenariosPlugin : BasePlugin
     enum ScenarioState
     {
         Inactive,
-        Loading,
         Active
     }
-
     public override string ModuleName => "Scenarios Plugin";
     public override string ModuleVersion => "0.0.1";
 
     private ScenarioState _state = ScenarioState.Inactive;
     private List<ScenarioConfig> _scenarioConfigs = new List<ScenarioConfig>();
+    private ScenarioConfig? _currentScenario = null;
     private List<SpawnPlayerAssignment> _spawnPlayerAssignments = new List<SpawnPlayerAssignment>();
     private static Random _random = new Random();
+
+    private void SetState(ScenarioState newState)
+    {
+        if (_state != newState)
+        {
+            Logger.LogDebug(String.Format("[Scenarios] Plugin state %s -> %s"), _state.ToString(), newState.ToString());
+            _state = newState;
+        }
+    }
 
     // TODO: can take 0 args if there is currently an active scenario
     [ConsoleCommand("sce_start", "Loads a scenario. Must be on the correct map, first.")]
@@ -82,13 +90,12 @@ public class ScenariosPlugin : BasePlugin
         {
             n--;
             int k = _random.Next(n + 1);
-            SpawnInfo value = shuffledSpawnInfos[k];
-            shuffledSpawnInfos[k] = shuffledSpawnInfos[n];
-            shuffledSpawnInfos[n] = value;
+            (shuffledSpawnInfos[k], shuffledSpawnInfos[n]) = (shuffledSpawnInfos[n], shuffledSpawnInfos[k]);
         }
 
         // Put us in the "loading" state so listeners behave accordingly
-        _state = ScenarioState.Loading;
+        _currentScenario = matchingScenario;
+        SetState(ScenarioState.Active);
 
         HashSet<string> usedSpawnNames = new HashSet<string>();
         _spawnPlayerAssignments.Clear();
@@ -136,7 +143,8 @@ public class ScenariosPlugin : BasePlugin
         {
             Logger.LogError("Failed to find base game rules entity. Bailing on scenario load.");
             _spawnPlayerAssignments.Clear();
-            _state = ScenarioState.Inactive;
+            SetState(ScenarioState.Inactive);
+            _currentScenario = null;
             return;
         }
 
@@ -164,14 +172,22 @@ public class ScenariosPlugin : BasePlugin
         currentConfig.SpawnInfos.Add(CTWindow);
 
         _scenarioConfigs.Add(currentConfig);
+    }
 
-        RegisterListener<Listeners.OnEntitySpawned>(entity =>
+    [GameEventHandler]
+    public HookResult OnRoundStart(EventRoundStart @event, GameEventInfo info)
+    {
+        Logger.LogDebug("[Scenarios] OnRoundStart++");
+        if (_state == ScenarioState.Active)
         {
-            if (_state == ScenarioState.Loading && entity.DesignerName == "cs_player_controller")
+            if (_currentScenario is null)
             {
-                var player = new CCSPlayerController(entity.Handle);
-                // TODO: find matching player in spawn assignments and set new position
+                Logger.LogDebug("[Scenarios] Current state is active, but there is no active scenario. Cannot start round, returning to inactive state.");
+                SetState(ScenarioState.Inactive);
+                return HookResult.Continue;
             }
-        });
+        }
+        Logger.LogDebug("[Scenarios] OnRoundStart--");
+        return HookResult.Continue;
     }
 }
